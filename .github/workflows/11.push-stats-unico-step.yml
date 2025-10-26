@@ -1,0 +1,25 @@
+name: 11 - Stats do push (único step)
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  stats_single:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Tudo de uma vez
+        run: |
+          echo "Agora (UTC): $(date -u '+%Y-%m-%d %H:%M:%S')"
+          echo "github.actor: ${{ github.actor }}"
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+          echo "Diff: $BEFORE..$AFTER"
+          changed=$(git diff --name-only "$BEFORE" "$AFTER" || true)
+          echo "$changed" | sed '/^\s*$/d' > changed.txt || true
+          html=$(grep -E '\.html$' changed.txt | wc -l || echo 0)
+          css=$(grep -E '\.css$'  changed.txt | wc -l || echo 0)
+          js=$(grep -E '\.js$'    changed.txt | wc -l || echo 0)
+          echo "HTML: $html | CSS: $css | JS: $js"

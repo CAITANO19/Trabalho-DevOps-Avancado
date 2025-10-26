@@ -1,0 +1,13 @@
+name: 03 - Calcular 2+2
+on:
+  workflow_dispatch:
+
+jobs:
+  calc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Calcular 2+2 e exibir
+        shell: bash
+        run: |
+          X=$((2+2))
+          echo "Resultado: $X"

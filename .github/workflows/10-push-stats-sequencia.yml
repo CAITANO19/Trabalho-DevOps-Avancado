@@ -1,0 +1,46 @@
+name: 10 - Stats do push (em sequência)
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  stats_seq:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Data/Hora (UTC)
+        shell: bash
+        run: |
+          echo "Agora (UTC): $(date -u '+%Y-%m-%d %H:%M:%S')"
+
+      - name: Usuário
+        shell: bash
+        run: |
+          echo "github.actor: ${{ github.actor }}"
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Contar arquivos HTML/CSS/JS alterados no push
+        id: counts
+        shell: bash
+        run: |
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+          echo "Diff entre $BEFORE..$AFTER"
+          changed=$(git diff --name-only "$BEFORE" "$AFTER" || true)
+          echo "$changed" | sed '/^\s*$/d' > changed.txt || true
+          html=$(grep -E '\.html$' changed.txt | wc -l || echo 0)
+          css=$(grep -E '\.css$'  changed.txt | wc -l || echo 0)
+          js=$(grep -E '\.js$'    changed.txt | wc -l || echo 0)
+          echo "HTML: $html | CSS: $css | JS: $js"
+          echo "html=$html" >> "$GITHUB_OUTPUT"
+          echo "css=$css"   >> "$GITHUB_OUTPUT"
+          echo "js=$js"     >> "$GITHUB_OUTPUT"
+
+      - name: Exibir totais
+        shell: bash
+        run: |
+          echo "HTML: ${{ steps.counts.outputs.html }}"
+          echo "CSS:  ${{ steps.counts.outputs.css }}"
+          echo "JS:   ${{ steps.counts.outputs.js }}"

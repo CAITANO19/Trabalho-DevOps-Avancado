@@ -1,0 +1,27 @@
+name: 06 - Criar README automático
+on:
+  workflow_dispatch:
+
+jobs:
+  create_readme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Gerar/atualizar README_AUTOMATICO.md
+        run: |
+          echo "# README Automático" > README_AUTOMATICO.md
+          echo "" >> README_AUTOMATICO.md
+          echo "- Gerado em: $(date -u '+%Y-%m-%d %H:%M:%S') UTC" >> README_AUTOMATICO.md
+          echo "- Actor: ${{ github.actor }}" >> README_AUTOMATICO.md
+          echo "" >> README_AUTOMATICO.md
+          echo "Arquivos no repo:" >> README_AUTOMATICO.md
+          ls -1 >> README_AUTOMATICO.md
+      - name: Commit & Push
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: atualizar README_AUTOMATICO.md"
+          file_pattern: "README_AUTOMATICO.md"

@@ -1,0 +1,12 @@
+name: 08 - Rodar apenas aos sábados (SP)
+on:
+  schedule:
+    - cron: "0 3 * * 6"  # 03:00 UTC todo sábado = 00:00 de sábado em São Paulo
+  workflow_dispatch:
+
+jobs:
+  saturday_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Só sabadão 😎
+        run: echo "Executando job de sábado."

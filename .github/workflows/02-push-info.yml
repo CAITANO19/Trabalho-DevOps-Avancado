@@ -1,0 +1,26 @@
+name: 02 - Info do Push (data/hora + usuário)
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - ".github/workflows/**"
+
+jobs:
+  push_info:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mostrar data/hora (UTC) do runner
+        shell: bash
+        run: |
+          echo "Data/Hora (UTC): $(date -u '+%Y-%m-%d %H:%M:%S')"
+
+      - name: Mostrar usuário do push
+        shell: bash
+        run: |
+          echo "Usuário (github.actor): ${{ github.actor }}"
+
+      - name: Extras do evento
+        shell: bash
+        run: |
+          echo "Ref: ${{ github.ref }}"
+          echo "Commit SHA: ${{ github.sha }}"

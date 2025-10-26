@@ -1,0 +1,23 @@
+name: 09 - Alerta de arquivos > 100KB
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  big_files:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Procurar arquivos >100KB
+        shell: bash
+        run: |
+          set -e
+          achados=$(find . -type f -size +100k | sed 's|^\./||' || true)
+          if [ -n "$achados" ]; then
+            echo "⚠️ Arquivos maiores que 100KB:"
+            echo "$achados"
+            exit 1
+          else
+            echo "✅ Nenhum arquivo acima de 100KB."
+          fi

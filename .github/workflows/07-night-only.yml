@@ -1,0 +1,14 @@
+name: 07 - Rodar apenas à noite (SP)
+on:
+  schedule:
+    - cron: "0 3-8 * * *"  # 03:00–08:00 UTC = 00:00–05:00 em São Paulo
+  workflow_dispatch:
+
+jobs:
+  night_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirmar horário
+        run: |
+          echo "Agora (UTC): $(date -u '+%Y-%m-%d %H:%M:%S')"
+          echo "Janela noturna de SP."

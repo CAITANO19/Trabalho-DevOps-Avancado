@@ -1,0 +1,17 @@
+name: 12 - Contar arquivos à meia-noite (SP)
+on:
+  schedule:
+    - cron: "0 3 * * *"  # 03:00 UTC = 00:00 em São Paulo
+  workflow_dispatch:
+
+jobs:
+  midnight_count:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Contar HTML/CSS/JS no repo
+        run: |
+          html=$(find . -type f -name "*.html" | wc -l)
+          css=$(find . -type f -name "*.css"  | wc -l)
+          js=$(find . -type f -name "*.js"    | wc -l)
+          echo "HTML: $html | CSS: $css | JS: $js"

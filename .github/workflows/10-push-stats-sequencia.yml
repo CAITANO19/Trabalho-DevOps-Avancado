@@ -25,18 +25,35 @@ jobs:
         id: counts
         shell: bash
         run: |
+          set -euo pipefail
+
           BEFORE="${{ github.event.before }}"
           AFTER="${{ github.sha }}"
-          echo "Diff entre $BEFORE..$AFTER"
-          changed=$(git diff --name-only "$BEFORE" "$AFTER" || true)
-          echo "$changed" | sed '/^\s*$/d' > changed.txt || true
-          html=$(grep -E '\.html$' changed.txt | wc -l || echo 0)
-          css=$(grep -E '\.css$'  changed.txt | wc -l || echo 0)
-          js=$(grep -E '\.js$'    changed.txt | wc -l || echo 0)
+
+          # Garante que teremos uma lista de arquivos mesmo no primeiro commit/push
+          if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
+            git diff --name-only "$BEFORE" "$AFTER" > changed.txt || true
+          else
+            git show --name-only --pretty="" "$AFTER" > changed.txt || true
+          fi
+
+          # Remove CR para evitar problemas no Linux runner
+          tr -d '\r' < changed.txt > changed.clean && mv changed.clean changed.txt
+
+          # Contagens robustas (grep -c). Se não houver match, ainda assim imprime 0.
+          html=$(grep -E -c '\.html$' changed.txt || true)
+          css=$(grep -E -c '\.css$'  changed.txt || true)
+          js=$(grep -E -c '\.js$'    changed.txt || true)
+
+          echo "Arquivos alterados (diff):"
+          cat changed.txt || true
           echo "HTML: $html | CSS: $css | JS: $js"
-          echo "html=$html" >> "$GITHUB_OUTPUT"
-          echo "css=$css"   >> "$GITHUB_OUTPUT"
-          echo "js=$js"     >> "$GITHUB_OUTPUT"
+
+          {
+            echo "html=$html"
+            echo "css=$css"
+            echo "js=$js"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Exibir totais
         shell: bash
